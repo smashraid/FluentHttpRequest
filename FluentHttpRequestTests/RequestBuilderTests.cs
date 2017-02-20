@@ -11,6 +11,8 @@ namespace FluentHttpRequest.Tests
     [TestClass()]
     public class RequestBuilderTests
     {
+        public class MibResult { public int ResultInfoCode { get; set; } public int From { get; set; } public int To { get; set; } public int RunEvery { get; set; } }
+
         [TestMethod()]
         public void CreateTest()
         {
@@ -20,7 +22,9 @@ namespace FluentHttpRequest.Tests
         [TestMethod()]
         public void ExecuteTest()
         {
-            Assert.Fail();
+            List<MibResult> response = (List<MibResult>) RequestBuilder.Create("https://lm.cignium.com/run/cignium/metlife/dev/mibjobconfiguration/").Execute().Extract("$").Fill<List<MibResult>>();
+
+            Assert.AreEqual(3,response.Count);
         }
     }
 }

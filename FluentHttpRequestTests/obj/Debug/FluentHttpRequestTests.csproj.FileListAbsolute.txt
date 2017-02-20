@@ -1,0 +1,10 @@
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\bin\Debug\FluentHttpRequestTests.dll
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\bin\Debug\FluentHttpRequestTests.pdb
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\bin\Debug\FluentHttpRequest.dll
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\bin\Debug\Microsoft.VisualStudio.QualityTools.UnitTestFramework.dll
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\bin\Debug\Newtonsoft.Json.dll
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\bin\Debug\FluentHttpRequest.pdb
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\bin\Debug\Newtonsoft.Json.xml
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\obj\Debug\FluentHttpRequestTests.csprojResolveAssemblyReference.cache
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\obj\Debug\FluentHttpRequestTests.dll
+C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequestTests\obj\Debug\FluentHttpRequestTests.pdb

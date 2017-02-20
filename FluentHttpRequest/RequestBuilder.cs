@@ -2,53 +2,107 @@
 using System.Collections.Specialized;
 using FluentHttpRequest.Helpers;
 using System.Web;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Collections.Generic;
 
 namespace FluentHttpRequest
 {
     public class RequestBuilder
     {
-        public Uri Endpoint { get; set; }
-        public NameValueCollection Parameters { set; get; }
+        private Uri _endpoint;
 
-        public NameValueCollection RequestHeaders { set; get; }
+        private NameValueCollection _parameters;
 
-        public Type FillType { set; get; }
+        private NameValueCollection _requestHeaders;
 
-        public HttpMethod Method { get; set; }
+        private Type _type;
 
-        public string StringResponse { get; set; }
+        private HttpMethod _method;
+
+        private string _response;
 
 
         private RequestBuilder()
         {
-            FillType = typeof(string);
+            this._type = typeof(string);
 
-            Parameters = HttpUtility.ParseQueryString(string.Empty);
+            this._parameters = HttpUtility.ParseQueryString(string.Empty);
 
-            RequestHeaders = new  NameValueCollection();
+            this._requestHeaders = new  NameValueCollection();
 
-            Method = HttpMethod.GET;
+            this._method = HttpMethod.GET;
         }
-
         public static RequestBuilder Create(string endpoint)
         {
-            return new RequestBuilder() { Endpoint = new Uri(endpoint) };
+            return new RequestBuilder() { _endpoint = new Uri(endpoint) };
         }
-
         public RequestBuilder Execute()
         {
-            switch (Method)
+            switch (this._method)
             {
                 case HttpMethod.GET:
-                    StringResponse = Http.Get(Endpoint, Parameters, RequestHeaders);
+                    this._response = Http.Get(this._endpoint, this._parameters, this._requestHeaders);
                     break;
+
                 case HttpMethod.POST:
-                    StringResponse = Http.Post(Endpoint, Parameters, RequestHeaders);
+                    this._response = Http.Post(this._endpoint, _parameters, this._requestHeaders);
                     break;
+
                 default:
-                    StringResponse = Http.Get(Endpoint, Parameters, RequestHeaders);
+                    this._response = Http.Get(this._endpoint, this._parameters, this._requestHeaders);
                     break;
             }
+
+            return this;
+        }
+        public RequestBuilder AddParam(string param, string value)
+        {
+            this._parameters.Add(param, value);
+
+            return this;
+        }
+        public RequestBuilder AddParam<T>(T value) where T : class
+        {
+            this._parameters.Add(value.ToNameCollection());
+
+            return this;
+        }
+        public RequestBuilder AddParam<T>(List<T> values) where T : class
+        {
+            values.ForEach(value => this._parameters.Add(value.ToNameCollection()));
+
+            return this;
+        }
+        public RequestBuilder AddHeader(string header, string value)
+        {
+            this._requestHeaders.Add(header, value);
+
+            return this;
+        }
+        public string GetQueryString(bool printPort = false)
+        {
+            var uriBuilder = new UriBuilder(this._endpoint) { Query = this._parameters.ToString() };
+
+            if (!printPort) uriBuilder.Port = -1;
+
+            return uriBuilder.ToString();
+        }
+        public RequestBuilder Method(HttpMethod method)
+        {
+            this._method = method;
+
+            return this;
+        }
+        public object Fill<T>()
+        {
+            return JsonConvert.DeserializeObject<T>(this._response);
+        }
+        public RequestBuilder Extract(string path)
+        {
+            JToken jsonResponse = JToken.Parse(this._response);
+
+            this._response = jsonResponse.SelectToken(path).ToString();
 
             return this;
         }

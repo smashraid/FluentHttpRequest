@@ -11,7 +11,6 @@ namespace FluentHttpRequest
             FindTokens(containerToken, name, matches);
             return matches;
         }
-
         private static void FindTokens(JToken containerToken, string name, List<JToken> matches)
         {
             if (containerToken.Type == JTokenType.Object)
