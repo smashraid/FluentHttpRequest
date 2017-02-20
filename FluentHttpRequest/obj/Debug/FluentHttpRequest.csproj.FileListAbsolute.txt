@@ -1,0 +1,6 @@
+c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\bin\Debug\FluentHttpRequest.dll
+c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\bin\Debug\FluentHttpRequest.pdb
+c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\bin\Debug\Newtonsoft.Json.dll
+c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\bin\Debug\Newtonsoft.Json.xml
+c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\obj\Debug\FluentHttpRequest.dll
+c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\obj\Debug\FluentHttpRequest.pdb
