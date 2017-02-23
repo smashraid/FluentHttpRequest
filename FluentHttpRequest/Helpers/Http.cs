@@ -7,14 +7,14 @@ namespace FluentHttpRequest.Helpers
 {
     public class Http
     {
-        public static string Get(Uri endopoint, NameValueCollection parameters, NameValueCollection headers)
+        public static string Get(string endopoint, NameValueCollection headers)
         {
-            return Request(HttpMethod.GET, endopoint, parameters, headers);
+            return Request(HttpMethod.GET, endopoint, headers);
         }
 
-        public static string Post(Uri endopoint, NameValueCollection parameters, NameValueCollection headers)
+        public static string Post(string endopoint, NameValueCollection headers)
         {
-            return Request(HttpMethod.POST, endopoint, parameters, headers);
+            return Request(HttpMethod.POST, endopoint, headers);
         }
 
         public static byte[] Download(string url)
@@ -29,7 +29,7 @@ namespace FluentHttpRequest.Helpers
             return download;
         }
 
-        private static string Request(HttpMethod method, Uri endopoint, NameValueCollection parameters = null, NameValueCollection headers = null)
+        private static string Request(HttpMethod method, string endopoint, NameValueCollection headers = null)
         {
             string strResponse = string.Empty;
 

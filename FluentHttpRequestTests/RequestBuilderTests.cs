@@ -5,6 +5,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
+using FluentHttpRequest.Helpers;
 
 namespace FluentHttpRequest.Tests
 {
@@ -14,17 +16,40 @@ namespace FluentHttpRequest.Tests
         public class MibResult { public int ResultInfoCode { get; set; } public int From { get; set; } public int To { get; set; } public int RunEvery { get; set; } }
 
         [TestMethod()]
-        public void CreateTest()
+        public void ExecuteTest()
         {
-            Assert.Fail();
+            List<MibResult> response = (List<MibResult>)RequestBuilder
+                .Create("https://lm.cignium.com/run/cignium/metlife/dev/mibjobconfiguration/")
+                .Execute().Fill<List<MibResult>>();
+
+            Assert.AreEqual(3, response.Count);
         }
 
         [TestMethod()]
-        public void ExecuteTest()
+        public void GetQueryStringTest()
         {
-            List<MibResult> response = (List<MibResult>) RequestBuilder.Create("https://lm.cignium.com/run/cignium/metlife/dev/mibjobconfiguration/").Execute().Extract("$").Fill<List<MibResult>>();
+            var request = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
+               .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
+               .GetQueryString();
+            
+            Assert.AreEqual("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms?Application+Id=164d7189-e40c-493c-8196-94b16bdd2c8a", request);
+        }
 
-            Assert.AreEqual(3,response.Count);
+        [TestMethod()]
+        public void RequestLMTest()
+        {
+            //var request = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
+            //   .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
+            //   .Execute()
+            //   .Fill<JObject>();
+
+            var r = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
+               .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
+               .ExecuteAsync();
+
+            r.Start();
+            var res = r.Result.Fill<JObject>();
+               
         }
     }
 }

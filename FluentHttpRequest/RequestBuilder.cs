@@ -5,6 +5,7 @@ using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace FluentHttpRequest
 {
@@ -42,44 +43,54 @@ namespace FluentHttpRequest
             switch (this._method)
             {
                 case HttpMethod.GET:
-                    this._response = Http.Get(this._endpoint, this._parameters, this._requestHeaders);
+                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
                     break;
 
                 case HttpMethod.POST:
-                    this._response = Http.Post(this._endpoint, _parameters, this._requestHeaders);
+                    this._response = Http.Post(this.GetQueryString(), this._requestHeaders);
                     break;
 
                 default:
-                    this._response = Http.Get(this._endpoint, this._parameters, this._requestHeaders);
+                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
                     break;
             }
 
             return this;
         }
+
+        public Task<RequestBuilder> ExecuteAsync()
+        {
+            return new Task<RequestBuilder>(()=> { return Execute();  });
+        }
+
         public RequestBuilder AddParam(string param, string value)
         {
             this._parameters.Add(param, value);
 
             return this;
         }
+
         public RequestBuilder AddParam<T>(T value) where T : class
         {
             this._parameters.Add(value.ToNameCollection());
 
             return this;
         }
+
         public RequestBuilder AddParam<T>(List<T> values) where T : class
         {
             values.ForEach(value => this._parameters.Add(value.ToNameCollection()));
 
             return this;
         }
+
         public RequestBuilder AddHeader(string header, string value)
         {
             this._requestHeaders.Add(header, value);
 
             return this;
         }
+
         public string GetQueryString(bool printPort = false)
         {
             var uriBuilder = new UriBuilder(this._endpoint) { Query = this._parameters.ToString() };
@@ -88,16 +99,19 @@ namespace FluentHttpRequest
 
             return uriBuilder.ToString();
         }
+
         public RequestBuilder Method(HttpMethod method)
         {
             this._method = method;
 
             return this;
         }
+
         public object Fill<T>()
         {
             return JsonConvert.DeserializeObject<T>(this._response);
         }
+
         public RequestBuilder Extract(string path)
         {
             JToken jsonResponse = JToken.Parse(this._response);

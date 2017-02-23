@@ -4,4 +4,3 @@ c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHt
 c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\bin\Debug\Newtonsoft.Json.xml
 c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\obj\Debug\FluentHttpRequest.dll
 c:\users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\obj\Debug\FluentHttpRequest.pdb
-C:\Users\rlopez\documents\visual studio 2015\Projects\FluentHttpRequest\FluentHttpRequest\obj\Debug\FluentHttpRequest.csprojResolveAssemblyReference.cache
