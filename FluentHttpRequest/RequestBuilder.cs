@@ -38,30 +38,6 @@ namespace FluentHttpRequest
         {
             return new RequestBuilder() { _endpoint = new Uri(endpoint) };
         }
-        public RequestBuilder Execute()
-        {
-            switch (this._method)
-            {
-                case HttpMethod.GET:
-                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
-                    break;
-
-                case HttpMethod.POST:
-                    this._response = Http.Post(this.GetQueryString(), this._requestHeaders);
-                    break;
-
-                default:
-                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
-                    break;
-            }
-
-            return this;
-        }
-
-        public Task<RequestBuilder> ExecuteAsync()
-        {
-            return new Task<RequestBuilder>(()=> { return Execute();  });
-        }
 
         public RequestBuilder AddParam(string param, string value)
         {
@@ -120,5 +96,35 @@ namespace FluentHttpRequest
 
             return this;
         }
+
+        public RequestBuilder Execute()
+        {
+            switch (this._method)
+            {
+                case HttpMethod.GET:
+                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
+                    break;
+
+                case HttpMethod.POST:
+                    this._response = Http.Post(this.GetQueryString(), this._requestHeaders);
+                    break;
+
+                default:
+                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
+                    break;
+            }
+
+            return this;
+        }
+
+        public Task<RequestBuilder> ExecuteAsync()
+        {
+            var execute = new Task<RequestBuilder>(() => { return Execute(); });
+
+            execute.Start();
+
+            return execute;
+        }
+
     }
 }
