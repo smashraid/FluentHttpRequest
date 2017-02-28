@@ -54,6 +54,7 @@
   </ItemGroup>
   <ItemGroup />
   <ItemGroup>
+    <None Include="FluentHttpRequest.nuspec" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
