@@ -16,6 +16,7 @@ namespace FluentHttpRequest
         private NameValueCollection _parameters;
 
         private NameValueCollection _requestHeaders;
+        private NameValueCollection _bodyParameters;
 
         private Type _type;
 
@@ -26,13 +27,15 @@ namespace FluentHttpRequest
 
         private RequestBuilder()
         {
-            this._type = typeof(string);
+            _type = typeof(string);
 
-            this._parameters = HttpUtility.ParseQueryString(string.Empty);
+            _parameters = HttpUtility.ParseQueryString(string.Empty);
 
-            this._requestHeaders = new  NameValueCollection();
+            _requestHeaders = new NameValueCollection();
 
-            this._method = HttpMethod.GET;
+            _bodyParameters = new NameValueCollection();
+
+            _method = HttpMethod.GET;
         }
         public static RequestBuilder Create(string endpoint)
         {
@@ -49,21 +52,24 @@ namespace FluentHttpRequest
         public RequestBuilder AddParam<T>(T value) where T : class
         {
             this._parameters.Add(value.ToNameCollection());
-
             return this;
         }
 
         public RequestBuilder AddParam<T>(List<T> values) where T : class
         {
             values.ForEach(value => this._parameters.Add(value.ToNameCollection()));
-
             return this;
         }
 
         public RequestBuilder AddHeader(string header, string value)
         {
             this._requestHeaders.Add(header, value);
+            return this;
+        }
 
+        public RequestBuilder AddBodyParam(string param, string value)
+        {
+            this._bodyParameters.Add(param, value);
             return this;
         }
 
@@ -97,33 +103,32 @@ namespace FluentHttpRequest
             return this;
         }
 
-        public RequestBuilder Execute()
+        public RequestBuilder Get()
         {
-            switch (this._method)
-            {
-                case HttpMethod.GET:
-                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
-                    break;
-
-                case HttpMethod.POST:
-                    this._response = Http.Post(this.GetQueryString(), this._requestHeaders);
-                    break;
-
-                default:
-                    this._response = Http.Get(this.GetQueryString(), this._requestHeaders);
-                    break;
-            }
-
+            _response = Http.Get(GetQueryString(), _requestHeaders);
             return this;
         }
 
-        public Task<RequestBuilder> ExecuteAsync()
+        public RequestBuilder Post()
         {
-            var execute = new Task<RequestBuilder>(() => { return Execute(); });
+            _response = Http.Post(GetQueryString(), _requestHeaders, _bodyParameters);
+            return this;
+        }
 
-            execute.Start();
+        public Task<RequestBuilder> GetAsync()
+        {
+            return Task.Run(() =>
+            {
+                return Get();
+            });
+        }
 
-            return execute;
+        public Task<RequestBuilder> PostAsync()
+        {
+            return Task.Run(() =>
+            {
+                return Get();
+            });
         }
 
     }
