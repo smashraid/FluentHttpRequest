@@ -15,12 +15,19 @@ namespace FluentHttpRequest.Tests
     {
         public class MibResult { public int ResultInfoCode { get; set; } public int From { get; set; } public int To { get; set; } public int RunEvery { get; set; } }
 
+        public class Post { public int Id { get; set; } public int UserId { get; set; } public string Title { get; set; } public string Body { get; set; } }
+
+        private const string baseUrl = "https://jsonplaceholder.typicode.com/";
+
         [TestMethod()]
         public void ExecuteTest()
         {
             List<MibResult> response = (List<MibResult>)RequestBuilder
                 .Create("https://lm.cignium.com/run/cignium/metlife/dev/mibjobconfiguration/")
-                .Execute().Fill<List<MibResult>>();
+                .Get().Fill<List<MibResult>>();
+
+            List<Post> posts = (List<Post>) RequestBuilder.Create(baseUrl + "posts")
+                .Get().Fill<List<Post>>();
 
             Assert.AreEqual(3, response.Count);
         }
@@ -36,20 +43,32 @@ namespace FluentHttpRequest.Tests
         }
 
         [TestMethod()]
-        public void RequestLMTest()
+        public async Task RequestLMTest()
         {
             //var request = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
             //   .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
             //   .Execute()
             //   .Fill<JObject>();
 
-            var r = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
+            var r = await RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")                
                .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
-               .ExecuteAsync();
+               .GetAsync();
 
-            r.Start();
-            var res = r.Result.Fill<JObject>();
-               
+            //r.Start();
+            var res = r.Fill<JObject>();               
+        }
+
+        [TestMethod]
+        public void RequestPost()
+        {
+          var response =  RequestBuilder
+                .Create(baseUrl + "posts")
+                .AddBodyParam("title", "foo")
+                .AddBodyParam("body", "bar")
+                .AddBodyParam("userId", "1")
+                .Post();
+
+            Assert.IsNotNull(response);
         }
     }
 }
