@@ -22,11 +22,11 @@ namespace FluentHttpRequest.Tests
         [TestMethod()]
         public void ExecuteTest()
         {
-            List<MibResult> response = (List<MibResult>)RequestBuilder
+            List<MibResult> response = RequestBuilder
                 .Create("https://lm.cignium.com/run/cignium/metlife/dev/mibjobconfiguration/")
                 .Get().Fill<List<MibResult>>();
 
-            List<Post> posts = (List<Post>) RequestBuilder.Create(baseUrl + "posts")
+            List<Post> posts = RequestBuilder.Create(baseUrl + "posts")
                 .Get().Fill<List<Post>>();
 
             Assert.AreEqual(3, response.Count);

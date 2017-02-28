@@ -89,7 +89,7 @@ namespace FluentHttpRequest
             return this;
         }
 
-        public object Fill<T>()
+        public T Fill<T>()
         {
             return JsonConvert.DeserializeObject<T>(this._response);
         }
