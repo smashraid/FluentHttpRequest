@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>FluentHttpRequest</id>
-    <version>1.0.5</version>
+    <version>1.0.6</version>
     <title>$title$</title>
     <authors>Rafael Lopez, Saulo Tsuchida</authors>
     <owners>Rafael Lopez, Saulo Tsuchida</owners>
@@ -11,7 +11,7 @@
     <iconUrl>http://ICON_URL_HERE_OR_DELETE_THIS_LINE</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Fluent Interface to Build and execute Http requests</description>
-    <releaseNotes>First alpha version.</releaseNotes>
+    <releaseNotes>Minor fixes</releaseNotes>
     <copyright>Copyright 2017</copyright>
     <tags>Fluent Http Request Builder</tags>
   </metadata>
