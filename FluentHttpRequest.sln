@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentHttpRequest.FileTrans
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentHttpRequest.LifecycleManagement", "FluentHttpRequest.LifecycleManagement\FluentHttpRequest.LifecycleManagement.csproj", "{D04185EF-53B7-4FE3-BBE7-6BAD789B7C1D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentHttpRequest.Cache", "FluentHttpRequest.Cache\FluentHttpRequest.Cache.csproj", "{105A7789-3EA7-4968-9601-E2ED2B38E823}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FluentHttpRequest.Cache", "FluentHttpRequest.Cache\FluentHttpRequest.Cache.csproj", "{1DC1C0A0-6E61-489C-9599-A0C4171CC7F2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +35,10 @@ Global
 		{D04185EF-53B7-4FE3-BBE7-6BAD789B7C1D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D04185EF-53B7-4FE3-BBE7-6BAD789B7C1D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D04185EF-53B7-4FE3-BBE7-6BAD789B7C1D}.Release|Any CPU.Build.0 = Release|Any CPU
-		{105A7789-3EA7-4968-9601-E2ED2B38E823}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{105A7789-3EA7-4968-9601-E2ED2B38E823}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{105A7789-3EA7-4968-9601-E2ED2B38E823}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{105A7789-3EA7-4968-9601-E2ED2B38E823}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DC1C0A0-6E61-489C-9599-A0C4171CC7F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DC1C0A0-6E61-489C-9599-A0C4171CC7F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DC1C0A0-6E61-489C-9599-A0C4171CC7F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DC1C0A0-6E61-489C-9599-A0C4171CC7F2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
