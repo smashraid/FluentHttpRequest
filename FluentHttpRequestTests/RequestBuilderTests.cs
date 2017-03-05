@@ -19,15 +19,21 @@ namespace FluentHttpRequest.Tests
 
         private const string baseUrl = "https://jsonplaceholder.typicode.com/";
 
+        IFluentHttp request = new RequestBuilder();
+
         [TestMethod()]
         public void ExecuteTest()
         {
-            List<MibResult> response = RequestBuilder
+
+            //request.Create().AddParam().AddParam().AddBodyParam().AddHeader()
+            //    .Get().Extract().Fill<>();
+
+            List<MibResult> response = request
                 .Create("https://lm.cignium.com/run/cignium/metlife/dev/mibjobconfiguration/")
                 .Get().Fill<List<MibResult>>();
 
-            List<Post> posts = RequestBuilder.Create(baseUrl + "posts")
-                .Get().Fill<List<Post>>();
+            var posts = request.Create(baseUrl + "posts")
+                .Get().Fill<IEnumerable<Post>>();
 
             Assert.AreEqual(3, response.Count);
         }
@@ -35,7 +41,7 @@ namespace FluentHttpRequest.Tests
         [TestMethod()]
         public void GetQueryStringTest()
         {
-            var request = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
+            var result = request.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
                .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
                .GetQueryString();
             
@@ -50,7 +56,7 @@ namespace FluentHttpRequest.Tests
             //   .Execute()
             //   .Fill<JObject>();
 
-            var r = await RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")                
+            var r = await request.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")                
                .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
                .GetAsync();
 
@@ -61,7 +67,7 @@ namespace FluentHttpRequest.Tests
         [TestMethod]
         public void RequestPost()
         {
-          var response =  RequestBuilder
+          var response =  request
                 .Create(baseUrl + "posts")
                 .AddBodyParam("title", "foo")
                 .AddBodyParam("body", "bar")
