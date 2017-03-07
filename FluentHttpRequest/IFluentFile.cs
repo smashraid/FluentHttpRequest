@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FluentHttpRequest.LifecycleManagement
+namespace FluentHttpRequest.File
 {
-    public class Class1
+    public interface IFluentFile
     {
     }
 }

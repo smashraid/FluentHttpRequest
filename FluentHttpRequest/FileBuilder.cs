@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace FluentHttpRequest
+namespace FluentHttpRequest.File
 {
-    public interface IFluentTransform
+    public class FileBuilder
     {
-        T Fill<T>();
     }
 }
