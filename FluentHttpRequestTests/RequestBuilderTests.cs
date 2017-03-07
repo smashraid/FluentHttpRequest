@@ -7,6 +7,8 @@ using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using FluentHttpRequest.Helpers;
+using FluentHttpRequest.CacheExtension;
+using FluentHttpRequest.LifecycleManagement;
 
 namespace FluentHttpRequest.Tests
 {
@@ -22,24 +24,51 @@ namespace FluentHttpRequest.Tests
         [TestMethod()]
         public void ExecuteTest()
         {
-            List<MibResult> response = RequestBuilder
-                .Create("https://lm.cignium.com/run/cignium/metlife/dev/mibjobconfiguration/")
+            var posts = RequestBuilder.Create(baseUrl + "posts")
+                .Get().Fill<IEnumerable<Post>>();
+
+            var post = RequestBuilder.Create(baseUrl + "posts/1")
+                .Get().Fill<Post>();
+
+            var posts2 = RequestBuilder.Create(baseUrl + "posts")
+                  .Get().FillWithCache<IEnumerable<Post>>("Id", "Post");
+
+            var post2 = RequestBuilder.Create(baseUrl + "posts/1")
+                .Get().FillWithCache<Post>("Id", "Custom");
+
+            //Cache.Storage.AddRange(posts,"Id", "Post");
+            Post p = Cache.Storage.Get<Post>("1", "Post");
+            Cache.Storage.Remove("1", "Post");
+            var pList = Cache.Storage.GetAll<Post>("Post");
+
+            List<MibResult> mib = RequestBuilder
+                .Project("metlife")
+                .Env("dev")
+                .Endpoint("mibjobconfiguration")
+                .AddSecurityKey("","")
+                .AddParam("","")
                 .Get().Fill<List<MibResult>>();
 
-            List<Post> posts = RequestBuilder.Create(baseUrl + "posts")
-                .Get().Fill<List<Post>>();
+            JObject app = RequestBuilder
+                .Project("moo-tla")
+                .Env("prod")
+                .Endpoint("getfullapplication")
+                .AddSecurityKey("key", "secret")
+                .AddParam("Id", "0cd066f6-1eb3-4d14-8e5c-776c6b82782e")
+                .Get()
+                .Fill<JObject>();
 
-            Assert.AreEqual(3, response.Count);
+            Assert.AreEqual(3, mib.Count);
         }
 
         [TestMethod()]
         public void GetQueryStringTest()
         {
-            var request = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
+            var result = RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
                .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
                .GetQueryString();
-            
-            Assert.AreEqual("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms?Application+Id=164d7189-e40c-493c-8196-94b16bdd2c8a", request);
+
+            Assert.AreEqual("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms?Application+Id=164d7189-e40c-493c-8196-94b16bdd2c8a", result);
         }
 
         [TestMethod()]
@@ -50,23 +79,23 @@ namespace FluentHttpRequest.Tests
             //   .Execute()
             //   .Fill<JObject>();
 
-            var r = await RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")                
+            var r = await RequestBuilder.Create("https://lm.cignium.com/run/cignium/lga/dev/view-pdf-forms")
                .AddParam("Application Id", "164d7189-e40c-493c-8196-94b16bdd2c8a")
                .GetAsync();
 
             //r.Start();
-            var res = r.Fill<JObject>();               
+            var res = r.Fill<JObject>();
         }
 
         [TestMethod]
         public void RequestPost()
         {
-          var response =  RequestBuilder
-                .Create(baseUrl + "posts")
-                .AddBodyParam("title", "foo")
-                .AddBodyParam("body", "bar")
-                .AddBodyParam("userId", "1")
-                .Post();
+            var response = RequestBuilder
+                  .Create(baseUrl + "posts")
+                  .AddBodyParam("title", "foo")
+                  .AddBodyParam("body", "bar")
+                  .AddBodyParam("userId", "1")
+                  .Post();
 
             Assert.IsNotNull(response);
         }

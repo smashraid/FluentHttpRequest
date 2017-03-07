@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Web;
 
@@ -9,14 +10,14 @@ namespace FluentHttpRequest.Helpers
 {
     public class Http
     {
-        public static string Get(string endopoint, NameValueCollection headers)
+        public static string Get(string endopoint, NameValueCollection headers = null, X509Certificate2 certificate = null)
         {
-            return Request(HttpMethod.GET, endopoint, headers);
+            return Request(HttpMethod.GET, endopoint, headers, certificate);
         }
 
-        public static string Post(string endopoint, NameValueCollection headers, NameValueCollection bodyParameters)
+        public static string Post(string endopoint, NameValueCollection headers, NameValueCollection bodyParameters = null, X509Certificate2 certificate = null)
         {
-            return Request(HttpMethod.POST, endopoint, headers, bodyParameters);
+            return Request(HttpMethod.POST, endopoint, headers, bodyParameters, certificate);
         }
 
         public static byte[] Download(string url)
@@ -34,12 +35,17 @@ namespace FluentHttpRequest.Helpers
         private static string Request(
             HttpMethod method, 
             string endopoint, 
-            NameValueCollection headers = null)
+            NameValueCollection headers = null,
+            X509Certificate2 certificate = null)
         {
             string strResponse = string.Empty;    
             HttpWebRequest request = (HttpWebRequest) HttpWebRequest.Create(endopoint);
             request.Method = method.ToString();
-
+            if (certificate != null)
+            {
+                request.ClientCertificates.Add(certificate);
+            }
+            
             if (headers != null) request.Headers.Add(headers);
 
             using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
@@ -58,7 +64,8 @@ namespace FluentHttpRequest.Helpers
          HttpMethod method,
          string endopoint,
          NameValueCollection headers = null,
-         NameValueCollection bodyParameters = null)
+         NameValueCollection bodyParameters = null,
+         X509Certificate2 certificate = null)
         {
             string strResponse = string.Empty;
             string postData = string.Empty;
@@ -70,8 +77,12 @@ namespace FluentHttpRequest.Helpers
             }
 
             HttpWebRequest request = (HttpWebRequest)HttpWebRequest.Create(endopoint);
-
             request.Method = method.ToString();
+            if (certificate != null)
+            {
+                request.ClientCertificates.Add(certificate);
+            }
+            if (headers != null) request.Headers.Add(headers);
 
             byte[] data = Encoding.ASCII.GetBytes(postData);
 
@@ -80,9 +91,7 @@ namespace FluentHttpRequest.Helpers
 
             Stream requestStream = request.GetRequestStream();
             requestStream.Write(data, 0, data.Length);
-            requestStream.Close();
-
-            if (headers != null) request.Headers.Add(headers);
+            requestStream.Close();            
 
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
