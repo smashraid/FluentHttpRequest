@@ -25,11 +25,11 @@ namespace FluentHttpRequest
         string GetQueryString(bool printPort = false);
     }
 
-    public interface IFluentProcess
+    public interface IFluentProcess : IFluentTransform
     {
         IFluentTransform Extract(string path);
-        T Fill<T>();
-        T FillWithCache<T>(string key, string region);
+        //T Fill<T>();
+        //T FillWithCache<T>(string key, string region);
     }
 
     public interface IFluentTransform

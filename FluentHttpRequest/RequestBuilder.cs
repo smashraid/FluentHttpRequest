@@ -13,10 +13,13 @@ using FluentHttpRequest.LifecycleManagement;
 using FluentHttpRequest.CacheExtension;
 using System.Collections;
 using System.Reflection;
+using System.Globalization;
+using System.Security.Cryptography;
+using System.Net;
 
 namespace FluentHttpRequest
 {
-    public class RequestBuilder : IFluentOperation, IFluentProcess, IFluentTransform, IFluentEnviroment, IFluentEndpoint
+    public class RequestBuilder : IFluentOperation, IFluentProcess, IFluentTransform, IFluentEnviroment, IFluentEndpoint, IFluentSecurity
     {
         private Uri _uri;
         private NameValueCollection _parameters;
@@ -57,11 +60,13 @@ namespace FluentHttpRequest
             return this;
         }
 
-        public IFluentOperation Endpoint(string endpoint)
+        public IFluentSecurity Endpoint(string endpoint)
         {
             _endpoint = endpoint;
             string u = $"https://lm.cignium.com/run/cignium/{_project}/{_enviroment}/{_endpoint}";
-            return new RequestBuilder() { _uri = new Uri(u) };
+            //return new RequestBuilder() { _uri = new Uri(u) };
+            _uri = new Uri(u);
+            return this;
         }
 
         public IFluentOperation AddParam(string param, string value)
@@ -165,7 +170,7 @@ namespace FluentHttpRequest
             T t = Fill<T>();
             if (t.GetType().GetInterface("IEnumerable") != null)
             {
-                IEnumerable<object> list = (IEnumerable<object>)t;                
+                IEnumerable<object> list = (IEnumerable<object>)t;
                 Cache.Storage.AddRange(list, key, region);
             }
             else
@@ -174,6 +179,20 @@ namespace FluentHttpRequest
                 Cache.Storage.Add(t, value.ToString(), region);
             }
             return t;
+        }
+
+        IFluentOperation IFluentSecurity.AddSecurityKey(string key, string secret)
+        {
+            string hash = string.Empty;
+            string currentUtcDate = DateTime.UtcNow.ToString(CultureInfo.InvariantCulture);
+            using (var hmac = new HMACSHA256(Encoding.UTF8.GetBytes(secret.ToUpper())))
+            {
+                byte[] computedHash = hmac.ComputeHash(Encoding.UTF8.GetBytes(string.Join("\n", "GET", currentUtcDate, _uri.AbsolutePath.ToLower())));
+                hash = Convert.ToBase64String(computedHash);
+            }
+            _requestHeaders.Add("Timestamp", currentUtcDate);
+            _requestHeaders.Add(HttpRequestHeader.Authorization.ToString(), "API-KEY" + " " + key + ":" + hash);
+            return this;            
         }
     }
 }

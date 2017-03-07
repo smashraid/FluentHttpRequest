@@ -6,13 +6,18 @@ using System.Threading.Tasks;
 
 namespace FluentHttpRequest.LifecycleManagement
 {
-    public partial interface IFluentEnviroment
+    public interface IFluentEnviroment
     {
         IFluentEndpoint Env(string enviroment);
     }
 
-    public partial interface IFluentEndpoint
+    public interface IFluentEndpoint
     {
-        IFluentOperation Endpoint(string endpoint);
+        IFluentSecurity Endpoint(string endpoint);        
+    }
+
+    public interface IFluentSecurity : IFluentOperation
+    {
+        IFluentOperation AddSecurityKey(string key, string secret);
     }
 }

@@ -41,7 +41,22 @@ namespace FluentHttpRequest.Tests
             Cache.Storage.Remove("1", "Post");
             var pList = Cache.Storage.GetAll<Post>("Post");
 
-            List<MibResult> mib = RequestBuilder.Project("metlife").Env("dev").Endpoint("mibjobconfiguration").Get().Fill<List<MibResult>>();
+            List<MibResult> mib = RequestBuilder
+                .Project("metlife")
+                .Env("dev")
+                .Endpoint("mibjobconfiguration")
+                .AddSecurityKey("","")
+                .AddParam("","")
+                .Get().Fill<List<MibResult>>();
+
+            JObject app = RequestBuilder
+                .Project("moo-tla")
+                .Env("prod")
+                .Endpoint("getfullapplication")
+                .AddSecurityKey("key", "secret")
+                .AddParam("Id", "0cd066f6-1eb3-4d14-8e5c-776c6b82782e")
+                .Get()
+                .Fill<JObject>();
 
             Assert.AreEqual(3, mib.Count);
         }
