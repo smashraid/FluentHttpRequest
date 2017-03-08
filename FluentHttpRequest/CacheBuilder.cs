@@ -21,9 +21,9 @@ namespace FluentHttpRequest.CacheExtension
         {
 
         }
-        private string Item(string key, string region)
+        private string Item(object key, string region)
         {
-            return $"{key}/{region}";
+            return $"{key.ToString()}/{region}";
         }
         public void AddRange<T>(IEnumerable<T> collection, string key, string region, CacheItemPriority cachePriority = CacheItemPriority.NotRemovable)
         {
@@ -33,7 +33,7 @@ namespace FluentHttpRequest.CacheExtension
                 Add(item, value.ToString(), region, cachePriority);
             }
         }
-        public void Add(object value, string key, string region, CacheItemPriority cachePriority = CacheItemPriority.NotRemovable)
+        public void Add(object value, object key, string region, CacheItemPriority cachePriority = CacheItemPriority.NotRemovable)
         {
             CacheItemPolicy policy = new CacheItemPolicy();
             policy.Priority = cachePriority;
@@ -44,11 +44,11 @@ namespace FluentHttpRequest.CacheExtension
                 memoryCache.Set(k, value, policy);
             }
         }
-        public T Get<T>(string key, string region)
+        public T Get<T>(object key, string region)
         {
             return (T)memoryCache.Get(Item(key, region));
         }
-        public void Remove(string key, string region)
+        public void Remove(object key, string region)
         {
             string k = Item(key, region);
             if (memoryCache.Contains(k))
@@ -72,7 +72,7 @@ namespace FluentHttpRequest.CacheExtension
         {
             memoryCache.Remove(region);
         }
-        public void RefreshCache<T>(string key, string region, T updateObject)
+        public void Update<T>(object key, string region, T updateObject)
         {
             IDictionary<string, object> removeObject = (IDictionary<string, object>)Get<T>(key, region);
             foreach (KeyValuePair<string, object> keyValuePair in (IDictionary<string, object>)updateObject)
