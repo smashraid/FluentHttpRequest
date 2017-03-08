@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,9 +22,9 @@ namespace FluentHttpRequest.CacheExtension
         {
 
         }
-        private string Item(string key, string region)
+        private string Item(object key, string region)
         {
-            return $"{key}/{region}";
+            return $"{key.ToString()}/{region}";
         }
         public void AddRange<T>(IEnumerable<T> collection, string key, string region, CacheItemPriority cachePriority = CacheItemPriority.NotRemovable)
         {
@@ -33,7 +34,7 @@ namespace FluentHttpRequest.CacheExtension
                 Add(item, value.ToString(), region, cachePriority);
             }
         }
-        public void Add(object value, string key, string region, CacheItemPriority cachePriority = CacheItemPriority.NotRemovable)
+        public void Add(object value, object key, string region, CacheItemPriority cachePriority = CacheItemPriority.NotRemovable)
         {
             CacheItemPolicy policy = new CacheItemPolicy();
             policy.Priority = cachePriority;
@@ -44,11 +45,11 @@ namespace FluentHttpRequest.CacheExtension
                 memoryCache.Set(k, value, policy);
             }
         }
-        public T Get<T>(string key, string region)
+        public T Get<T>(object key, string region)
         {
             return (T)memoryCache.Get(Item(key, region));
         }
-        public void Remove(string key, string region)
+        public void Remove(object key, string region)
         {
             string k = Item(key, region);
             if (memoryCache.Contains(k))
@@ -72,16 +73,13 @@ namespace FluentHttpRequest.CacheExtension
         {
             memoryCache.Remove(region);
         }
-        public void RefreshCache<T>(string key, string region, T updateObject)
+        public void Update<T>(object key, string region, T updateObject)
         {
-            IDictionary<string, object> removeObject = (IDictionary<string, object>)Get<T>(key, region);
-            foreach (KeyValuePair<string, object> keyValuePair in (IDictionary<string, object>)updateObject)
+            T t = Get<T>(key, region);
+            foreach (PropertyInfo p in t.GetType().GetProperties())
             {
-                if (removeObject.ContainsKey(keyValuePair.Key))
-                {
-                    removeObject[keyValuePair.Key] = ((IDictionary<string, object>)updateObject)[keyValuePair.Key];
-                }
-            }
+                p.SetValue(t, updateObject.GetType().GetProperty(p.Name).GetValue(updateObject));
+            } 
         }
     }
 }

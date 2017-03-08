@@ -37,9 +37,14 @@ namespace FluentHttpRequest.Tests
                 .Get().FillWithCache<Post>("Id", "Custom");
 
             //Cache.Storage.AddRange(posts,"Id", "Post");
-            Post p = Cache.Storage.Get<Post>("1", "Post");
-            Cache.Storage.Remove("1", "Post");
+            Cache.Storage.Add(post, post.Id, "Post");
+            Post p = Cache.Storage.Get<Post>(1, "Post");
+            p.Title = "This is an update of the cache test";
+            Cache.Storage.Update(1, "Post", p);
+            Post p2 = Cache.Storage.Get<Post>(1, "Post");
+            Cache.Storage.Remove(1, "Post");
             var pList = Cache.Storage.GetAll<Post>("Post");
+            Cache.Storage.RemoveAll("Post");
 
             List<MibResult> mib = RequestBuilder
                 .Project("metlife")
