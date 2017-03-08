@@ -16,6 +16,6 @@ namespace FluentHttpRequest.CacheExtension
         IEnumerable<T> GetAll<T>(string region);
         bool HasItems();
         void RemoveAll(string region);
-        void RefreshCache<T>(object key, string region, T updateObject);
+        void Update<T>(object key, string region, T updateObject);
     }    
 }

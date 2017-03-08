@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.Caching;
 using System.Text;
 using System.Threading.Tasks;
@@ -74,14 +75,11 @@ namespace FluentHttpRequest.CacheExtension
         }
         public void Update<T>(object key, string region, T updateObject)
         {
-            IDictionary<string, object> removeObject = (IDictionary<string, object>)Get<T>(key, region);
-            foreach (KeyValuePair<string, object> keyValuePair in (IDictionary<string, object>)updateObject)
+            T t = Get<T>(key, region);
+            foreach (PropertyInfo p in t.GetType().GetProperties())
             {
-                if (removeObject.ContainsKey(keyValuePair.Key))
-                {
-                    removeObject[keyValuePair.Key] = ((IDictionary<string, object>)updateObject)[keyValuePair.Key];
-                }
-            }
+                p.SetValue(t, updateObject.GetType().GetProperty(p.Name).GetValue(updateObject));
+            } 
         }
     }
 }
