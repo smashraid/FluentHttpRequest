@@ -35,6 +35,6 @@ namespace FluentHttpRequest
     public interface IFluentTransform
     {
         T Fill<T>();
-        T FillWithCache<T>(string key, string region);        
+        T FillWithCache<T>(string key, string region, bool withFallback = false);        
     }
 }

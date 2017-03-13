@@ -6,7 +6,16 @@ using System.Threading.Tasks;
 
 namespace FluentHttpRequest.FileExtension
 {
-    public interface IFluentFile
+    public interface IFluentFileFtp
     {
+        void Upload();
+        byte[] Download();
+
+    }
+
+    public interface IFluentFileSFtp
+    {
+        void Upload();
+        byte[] Download();
     }
 }

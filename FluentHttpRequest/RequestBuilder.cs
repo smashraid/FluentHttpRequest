@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Net;
+using FluentHttpRequest.FileExtension;
 
 namespace FluentHttpRequest
 {
@@ -165,7 +166,7 @@ namespace FluentHttpRequest
             return JsonConvert.DeserializeObject<T>(_response);
         }
 
-        public T FillWithCache<T>(string key, string region)
+        public T FillWithCache<T>(string key, string region, bool withFallback = false)
         {
             T t = Fill<T>();
             if (t.GetType().GetInterface("IEnumerable") != null)
@@ -177,6 +178,11 @@ namespace FluentHttpRequest
             {
                 object value = t.GetType().GetProperty(key).GetValue(t);
                 Cache.Storage.Add(t, value.ToString(), region);
+            }
+            if (withFallback)
+            {
+                string path = $"{AppDomain.CurrentDomain.BaseDirectory}/{region}.cache"; 
+                FileBuilder.Flat.Write(path, JsonConvert.SerializeObject(t));
             }
             return t;
         }
@@ -194,5 +200,6 @@ namespace FluentHttpRequest
             _requestHeaders.Add(HttpRequestHeader.Authorization.ToString(), "API-KEY" + " " + key + ":" + hash);
             return this;            
         }
+
     }
 }
