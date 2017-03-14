@@ -2,6 +2,7 @@
 using System.Collections.Specialized;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Web;
@@ -46,15 +47,17 @@ namespace FluentHttpRequest.Helpers
                 request.ClientCertificates.Add(certificate);
             }
             
-            if (headers != null) request.Headers.Add(headers);
+            if (headers != null) request.Headers.Add(headers);         
 
-            using (HttpWebResponse response = (HttpWebResponse) request.GetResponse())
-            {               
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                strResponse = reader.ReadToEnd();
-                reader.Close();
-                dataStream.Close();
+            using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+            {
+                using (Stream dataStream = response.GetResponseStream())
+                {
+                    using (StreamReader reader = new StreamReader(dataStream))
+                    {
+                        strResponse = reader.ReadToEnd();
+                    }
+                }
             }
 
             return strResponse;
@@ -95,14 +98,17 @@ namespace FluentHttpRequest.Helpers
 
             using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
             {
-                Stream dataStream = response.GetResponseStream();
-                StreamReader reader = new StreamReader(dataStream);
-                strResponse = reader.ReadToEnd();
-                reader.Close();
-                dataStream.Close();
+                using (Stream dataStream = response.GetResponseStream())
+                {
+                    using (StreamReader reader = new StreamReader(dataStream))
+                    {
+                        strResponse = reader.ReadToEnd();
+                    }
+                }                
             }
 
             return strResponse;
         }
+                
     }
 }

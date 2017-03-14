@@ -33,7 +33,7 @@ namespace FluentHttpRequest.Tests
                 .Get().Fill<Post>();
 
             Assert.Greater(posts.Count(), 0);
-            FileBuilder.Ftp.Upload();
+            //FileBuilder.Ftp.Upload();
         }
 
         [Test]
@@ -63,13 +63,15 @@ namespace FluentHttpRequest.Tests
         }
 
         [Test]
-        public void LyfecyclManagement_Test()
+        public async Task LyfecyclManagement_Test()
         {
-            List<MibResult> mib = RequestBuilder
+            var process = await RequestBuilder
                 .Project("metlife")
                 .Env("dev")
                 .Endpoint("mibjobconfiguration")
-                .Get().Fill<List<MibResult>>();
+                .GetAsync();
+
+            List<MibResult> mib = process.Fill<List<MibResult>>();
 
             //JObject app = RequestBuilder
             //    .Project("moo-tla")
@@ -84,14 +86,14 @@ namespace FluentHttpRequest.Tests
         }
 
         [Test]
-        public void RequestPost()
+        public async Task RequestPost()
         {
-            var response = RequestBuilder
+            var response = await RequestBuilder
                   .Create(baseUrl + "posts")
                   .AddBodyParam("title", "foo")
                   .AddBodyParam("body", "bar")
                   .AddBodyParam("userId", "1")
-                  .Post();
+                  .PostAsync();
 
             Assert.IsNotNull(response);
         }
