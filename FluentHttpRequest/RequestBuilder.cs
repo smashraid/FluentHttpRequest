@@ -17,6 +17,8 @@ using System.Globalization;
 using System.Security.Cryptography;
 using System.Net;
 using FluentHttpRequest.FileExtension;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace FluentHttpRequest
 {
@@ -49,18 +51,15 @@ namespace FluentHttpRequest
         {
             return new RequestBuilder() { _uri = new Uri(url) };
         }
-
         public static IFluentEnviroment Project(string name)
         {
             return new RequestBuilder() { _project = name };
         }
-
         public IFluentEndpoint Env(string enviroment)
         {
             _enviroment = enviroment;
             return this;
         }
-
         public IFluentSecurity Endpoint(string endpoint)
         {
             _endpoint = endpoint;
@@ -69,25 +68,21 @@ namespace FluentHttpRequest
             _uri = new Uri(u);
             return this;
         }
-
         public IFluentOperation AddParam(string param, string value)
         {
             _parameters.Add(param, value);
             return this;
         }
-
         public IFluentOperation AddHeader(string header, string value)
         {
             _requestHeaders.Add(header, value);
             return this;
         }
-
         public IFluentOperation AddBodyParam(string param, string value)
         {
             _bodyParameters.Add(param, value);
             return this;
         }
-
         public IFluentOperation AddCertificate(string name, StoreName storeName = StoreName.Root, StoreLocation storeLocation = StoreLocation.CurrentUser)
         {
             X509Store x509CertStore = new X509Store(storeName, storeLocation);
@@ -97,55 +92,174 @@ namespace FluentHttpRequest
             x509CertStore.Close();
             return this;
         }
-
         public IFluentOperation AddCertificate(string name, string password)
         {
             _certificate = new X509Certificate2(name, password);
             return this;
         }
-
         public IFluentProcess Get()
         {
             _response = Http.Get(GetQueryString(), _requestHeaders, _certificate);
             return this;
         }
-
         public IFluentProcess Post()
         {
             _response = Http.Post(GetQueryString(), _requestHeaders, _bodyParameters, _certificate);
             return this;
         }
-
-        public Task<IFluentProcess> GetAsync()
+        public async Task<IFluentProcess> GetAsync()
         {
-            return Task.Run(() =>
+            using (WebRequestHandler handler = new WebRequestHandler())
             {
-                return Get();
-            });
+                if (_certificate != null)
+                {
+                    handler.ClientCertificates.Add(_certificate);
+                }
+
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var httpRequestMessage = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(GetQueryString()),
+                        Method = System.Net.Http.HttpMethod.Get
+                    };
+
+                    foreach (string key in _requestHeaders.Keys)
+                    {
+                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
+                    }
+
+                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            using (HttpContent content = response.Content)
+                            {
+                                _response = await content.ReadAsStringAsync();
+                            }
+                        }
+                    }
+                }
+            }
+            return this;
         }
-
-        public Task<IFluentProcess> GetAsync(CancellationToken cancellationToken)
+        public async Task<IFluentProcess> GetAsync(CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            using (WebRequestHandler handler = new WebRequestHandler())
             {
-                return Get();
-            }, cancellationToken);
+                if (_certificate != null)
+                {
+                    handler.ClientCertificates.Add(_certificate);
+                }
+
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var httpRequestMessage = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(GetQueryString()),
+                        Method = System.Net.Http.HttpMethod.Get
+                    };
+                    
+                    foreach (string key in _requestHeaders.Keys)
+                    {
+                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
+                    }
+
+                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage, cancellationToken))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            using (HttpContent content = response.Content)
+                            {
+                                _response = await content.ReadAsStringAsync();
+                            }
+                        }
+                    }
+                }
+            }
+            return this;
         }
-
-        public Task<IFluentProcess> PostAsync()
+        public async Task<IFluentProcess> PostAsync()
         {
-            return Task.Run(() =>
+            using (WebRequestHandler handler = new WebRequestHandler())
             {
-                return Post();
-            });
+                if (_certificate != null)
+                {
+                    handler.ClientCertificates.Add(_certificate);
+                }
+
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var httpRequestMessage = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(GetQueryString()),
+                        Method = System.Net.Http.HttpMethod.Post
+                    };
+
+                    foreach (string key in _requestHeaders.Keys)
+                    {
+                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
+                    }
+
+                    if (_bodyParameters.Count > 0)
+                    {
+                        httpRequestMessage.Content = new FormUrlEncodedContent(_bodyParameters.ToKeyValuePairCollection());
+                    }                    
+
+                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            using (HttpContent content = response.Content)
+                            {
+                                _response = await content.ReadAsStringAsync();
+                            }
+                        }
+                    }
+                }
+            }
+            return this;
         }
-
-        public Task<IFluentProcess> PostAsync(CancellationToken cancellationToken)
+        public async Task<IFluentProcess> PostAsync(CancellationToken cancellationToken)
         {
-            return Task.Run(() =>
+            using (WebRequestHandler handler = new WebRequestHandler())
             {
-                return Post();
-            }, cancellationToken);
+                if (_certificate != null)
+                {
+                    handler.ClientCertificates.Add(_certificate);
+                }
+
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var httpRequestMessage = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(GetQueryString()),
+                        Method = System.Net.Http.HttpMethod.Post
+                    };
+
+                    foreach (string key in _requestHeaders.Keys)
+                    {
+                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
+                    }
+
+                    if (_bodyParameters.Count > 0)
+                    {
+                        httpRequestMessage.Content = new FormUrlEncodedContent(_bodyParameters.ToKeyValuePairCollection());
+                    }
+
+                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage, cancellationToken))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            using (HttpContent content = response.Content)
+                            {
+                                _response = await content.ReadAsStringAsync();
+                            }
+                        }
+                    }
+                }
+            }
+            return this;
         }
         public string GetQueryString(bool printPort = false)
         {
@@ -153,20 +267,22 @@ namespace FluentHttpRequest
             if (!printPort) uriBuilder.Port = -1;
             return uriBuilder.ToString();
         }
-
         public IFluentTransform Extract(string path)
         {
             JToken jsonResponse = JToken.Parse(_response);
             _response = jsonResponse.SelectToken(path).ToString();
             return this;
         }
-
         public T Fill<T>()
         {
-            return JsonConvert.DeserializeObject<T>(_response);
+            T t = default(T);
+            if (!string.IsNullOrEmpty(_response))
+            {
+               t = JsonConvert.DeserializeObject<T>(_response);
+            }
+            return t;
         }
-
-        public T FillWithCache<T>(string key, string region, bool withFallback = false)
+        public T FillWithCache<T>(string key, string region, bool withFallback = false) 
         {
             T t = Fill<T>();
             if (t.GetType().GetInterface("IEnumerable") != null)
@@ -186,7 +302,6 @@ namespace FluentHttpRequest
             }
             return t;
         }
-
         IFluentOperation IFluentSecurity.AddSecurityKey(string key, string secret)
         {
             string hash = string.Empty;

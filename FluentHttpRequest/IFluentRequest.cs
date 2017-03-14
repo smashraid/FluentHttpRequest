@@ -27,9 +27,7 @@ namespace FluentHttpRequest
 
     public interface IFluentProcess : IFluentTransform
     {
-        IFluentTransform Extract(string path);
-        //T Fill<T>();
-        //T FillWithCache<T>(string key, string region);
+        IFluentTransform Extract(string path);        
     }
 
     public interface IFluentTransform
