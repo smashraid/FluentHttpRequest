@@ -48,14 +48,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CacheBuilder.cs" />
-    <Compile Include="Enums\HttpMethod.cs" />
-    <Compile Include="Extensions\ConvertExtension.cs" />
-    <Compile Include="Extensions\JTokenExtension.cs" />
-    <Compile Include="FileBuilder.cs" />
     <Compile Include="GlobalSuppressions.cs" />
-    <Compile Include="Helpers\Http.cs" />
     <Compile Include="IFluentCache.cs" />
-    <Compile Include="IFluentFile.cs" />
     <Compile Include="IFluentLifecycleManagement.cs" />
     <Compile Include="IFluentRequest.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
