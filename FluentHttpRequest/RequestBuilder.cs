@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Specialized;
-using FluentHttpRequest.Helpers;
 using System.Web;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -16,13 +15,13 @@ using System.Reflection;
 using System.Globalization;
 using System.Security.Cryptography;
 using System.Net;
-using FluentHttpRequest.FileExtension;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.IO;
 
 namespace FluentHttpRequest
 {
-    public class RequestBuilder : IFluentOperation, IFluentProcess, IFluentTransform, IFluentEnviroment, IFluentEndpoint, IFluentSecurity
+    public class RequestBuilder : IFluentOperation, IFluentEnviroment, IFluentEndpoint, IFluentSecurity
     {
         private Uri _uri;
         private NameValueCollection _parameters;
@@ -36,15 +35,15 @@ namespace FluentHttpRequest
         private string _enviroment;
         private string _endpoint;
 
+        private Utils _utils;
+
         private RequestBuilder()
         {
             _type = typeof(string);
-
             _parameters = HttpUtility.ParseQueryString(string.Empty);
-
             _requestHeaders = new NameValueCollection();
-
             _bodyParameters = new NameValueCollection();
+            _utils = new Utils();
         }
 
         public static IFluentOperation Create(string url)
@@ -97,211 +96,6 @@ namespace FluentHttpRequest
             _certificate = new X509Certificate2(name, password);
             return this;
         }
-        public IFluentProcess Get()
-        {
-            _response = Http.Get(GetQueryString(), _requestHeaders, _certificate);
-            return this;
-        }
-        public IFluentProcess Post()
-        {
-            _response = Http.Post(GetQueryString(), _requestHeaders, _bodyParameters, _certificate);
-            return this;
-        }
-        public async Task<IFluentProcess> GetAsync()
-        {
-            using (WebRequestHandler handler = new WebRequestHandler())
-            {
-                if (_certificate != null)
-                {
-                    handler.ClientCertificates.Add(_certificate);
-                }
-
-                using (HttpClient client = new HttpClient(handler))
-                {
-                    var httpRequestMessage = new HttpRequestMessage()
-                    {
-                        RequestUri = new Uri(GetQueryString()),
-                        Method = System.Net.Http.HttpMethod.Get
-                    };
-
-                    foreach (string key in _requestHeaders.Keys)
-                    {
-                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
-                    }
-
-                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage))
-                    {
-                        if (response.IsSuccessStatusCode)
-                        {
-                            using (HttpContent content = response.Content)
-                            {
-                                _response = await content.ReadAsStringAsync();
-                            }
-                        }
-                    }
-                }
-            }
-            return this;
-        }
-        public async Task<IFluentProcess> GetAsync(CancellationToken cancellationToken)
-        {
-            using (WebRequestHandler handler = new WebRequestHandler())
-            {
-                if (_certificate != null)
-                {
-                    handler.ClientCertificates.Add(_certificate);
-                }
-
-                using (HttpClient client = new HttpClient(handler))
-                {
-                    var httpRequestMessage = new HttpRequestMessage()
-                    {
-                        RequestUri = new Uri(GetQueryString()),
-                        Method = System.Net.Http.HttpMethod.Get
-                    };
-                    
-                    foreach (string key in _requestHeaders.Keys)
-                    {
-                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
-                    }
-
-                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage, cancellationToken))
-                    {
-                        if (response.IsSuccessStatusCode)
-                        {
-                            using (HttpContent content = response.Content)
-                            {
-                                _response = await content.ReadAsStringAsync();
-                            }
-                        }
-                    }
-                }
-            }
-            return this;
-        }
-        public async Task<IFluentProcess> PostAsync()
-        {
-            using (WebRequestHandler handler = new WebRequestHandler())
-            {
-                if (_certificate != null)
-                {
-                    handler.ClientCertificates.Add(_certificate);
-                }
-
-                using (HttpClient client = new HttpClient(handler))
-                {
-                    var httpRequestMessage = new HttpRequestMessage()
-                    {
-                        RequestUri = new Uri(GetQueryString()),
-                        Method = System.Net.Http.HttpMethod.Post
-                    };
-
-                    foreach (string key in _requestHeaders.Keys)
-                    {
-                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
-                    }
-
-                    if (_bodyParameters.Count > 0)
-                    {
-                        httpRequestMessage.Content = new FormUrlEncodedContent(_bodyParameters.ToKeyValuePairCollection());
-                    }                    
-
-                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage))
-                    {
-                        if (response.IsSuccessStatusCode)
-                        {
-                            using (HttpContent content = response.Content)
-                            {
-                                _response = await content.ReadAsStringAsync();
-                            }
-                        }
-                    }
-                }
-            }
-            return this;
-        }
-        public async Task<IFluentProcess> PostAsync(CancellationToken cancellationToken)
-        {
-            using (WebRequestHandler handler = new WebRequestHandler())
-            {
-                if (_certificate != null)
-                {
-                    handler.ClientCertificates.Add(_certificate);
-                }
-
-                using (HttpClient client = new HttpClient(handler))
-                {
-                    var httpRequestMessage = new HttpRequestMessage()
-                    {
-                        RequestUri = new Uri(GetQueryString()),
-                        Method = System.Net.Http.HttpMethod.Post
-                    };
-
-                    foreach (string key in _requestHeaders.Keys)
-                    {
-                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
-                    }
-
-                    if (_bodyParameters.Count > 0)
-                    {
-                        httpRequestMessage.Content = new FormUrlEncodedContent(_bodyParameters.ToKeyValuePairCollection());
-                    }
-
-                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage, cancellationToken))
-                    {
-                        if (response.IsSuccessStatusCode)
-                        {
-                            using (HttpContent content = response.Content)
-                            {
-                                _response = await content.ReadAsStringAsync();
-                            }
-                        }
-                    }
-                }
-            }
-            return this;
-        }
-        public string GetQueryString(bool printPort = false)
-        {
-            var uriBuilder = new UriBuilder(_uri) { Query = _parameters.ToString() };
-            if (!printPort) uriBuilder.Port = -1;
-            return uriBuilder.ToString();
-        }
-        public IFluentTransform Extract(string path)
-        {
-            JToken jsonResponse = JToken.Parse(_response);
-            _response = jsonResponse.SelectToken(path).ToString();
-            return this;
-        }
-        public T Fill<T>()
-        {
-            T t = default(T);
-            if (!string.IsNullOrEmpty(_response))
-            {
-               t = JsonConvert.DeserializeObject<T>(_response);
-            }
-            return t;
-        }
-        public T FillWithCache<T>(string key, string region, bool withFallback = false) 
-        {
-            T t = Fill<T>();
-            if (t.GetType().GetInterface("IEnumerable") != null)
-            {
-                IEnumerable<object> list = (IEnumerable<object>)t;
-                Cache.Storage.AddRange(list, key, region);
-            }
-            else
-            {
-                object value = t.GetType().GetProperty(key).GetValue(t);
-                Cache.Storage.Add(t, value.ToString(), region);
-            }
-            if (withFallback)
-            {
-                string path = $"{AppDomain.CurrentDomain.BaseDirectory}/{region}.cache"; 
-                FileBuilder.Flat.Write(path, JsonConvert.SerializeObject(t));
-            }
-            return t;
-        }
         IFluentOperation IFluentSecurity.AddSecurityKey(string key, string secret)
         {
             string hash = string.Empty;
@@ -313,8 +107,319 @@ namespace FluentHttpRequest
             }
             _requestHeaders.Add("Timestamp", currentUtcDate);
             _requestHeaders.Add(HttpRequestHeader.Authorization.ToString(), "API-KEY" + " " + key + ":" + hash);
-            return this;            
+            return this;
+        }
+        public string GetQueryString(bool printPort = false)
+        {
+            var uriBuilder = new UriBuilder(_uri) { Query = _parameters.ToString() };
+            if (!printPort) uriBuilder.Port = -1;
+            return uriBuilder.ToString();
         }
 
+        public T Get<T>(string path = null)
+        {
+            string response = Request(HttpMethod.Get, GetQueryString(), _requestHeaders, null, _certificate);
+            if (!string.IsNullOrEmpty(path))
+            {
+                response = _utils.Extract(response, path);
+            }
+            T result = _utils.Fill<T>(response);
+            return result;
+        }
+
+        public async Task<T> GetAsync<T>(string path = null)
+        {
+            return await GetAsync<T>(CancellationToken.None, path);
+        }
+        public async Task<T> GetAsync<T>(CancellationToken cancellationToken, string path = null)
+        {
+            string response = await RequestAsync(System.Net.Http.HttpMethod.Get, cancellationToken);
+            if (!string.IsNullOrEmpty(path))
+            {
+                response = _utils.Extract(response, path);
+            }
+            T result = _utils.Fill<T>(response);
+            return result;
+        }
+
+        public T Post<T>(string path = null)
+        {
+            string response = Request(HttpMethod.Post, GetQueryString(), _requestHeaders, _bodyParameters, _certificate);
+            if (!string.IsNullOrEmpty(path))
+            {
+                response = _utils.Extract(response, path);
+            }
+            T result = _utils.Fill<T>(response);
+            return result;
+        }
+
+        public async Task<T> PostAsync<T>(string path = null)
+        {
+            return await PostAsync<T>(CancellationToken.None, path);
+        }
+
+        public async Task<T> PostAsync<T>(CancellationToken cancellationToken, string path = null)
+        {
+            string response = await RequestAsync(System.Net.Http.HttpMethod.Post, cancellationToken);
+            if (!string.IsNullOrEmpty(path))
+            {
+                response = _utils.Extract(response, path);
+            }
+            T result = _utils.Fill<T>(response);
+            return result;
+        }
+
+        #region Helper
+
+        internal string Request(
+     System.Net.Http.HttpMethod method,
+     string url,
+     NameValueCollection headers = null,
+     NameValueCollection bodyParameters = null,
+     X509Certificate2 certificate = null)
+        {
+            string response = string.Empty;
+            HttpWebRequest httpWebRequest = (HttpWebRequest)WebRequest.Create(url);
+            httpWebRequest.Method = method.Method;
+            if (certificate != null) { httpWebRequest.ClientCertificates.Add(certificate); }
+            if (headers != null && headers.Count > 0) { httpWebRequest.Headers.Add(headers); }
+            if (bodyParameters != null && bodyParameters.Count > 0)
+            {
+                byte[] data = Encoding.ASCII.GetBytes(bodyParameters.GetPostData());
+                httpWebRequest.ContentType = "application/x-www-form-urlencoded";
+                httpWebRequest.ContentLength = data.Length;
+                Stream requestStream = httpWebRequest.GetRequestStream();
+                requestStream.Write(data, 0, data.Length);
+                requestStream.Close();
+            }
+
+            using (HttpWebResponse httpWebResponse = (HttpWebResponse)httpWebRequest.GetResponse())
+            {
+                using (Stream dataStream = httpWebResponse.GetResponseStream())
+                {
+                    using (StreamReader reader = new StreamReader(dataStream))
+                    {
+                        response = reader.ReadToEnd();
+                    }
+                }
+            }
+
+            return response;
+        }
+
+        private async Task<string> RequestAsync(System.Net.Http.HttpMethod method, CancellationToken cancellationToken)
+        {
+            string result = string.Empty;
+            using (WebRequestHandler handler = new WebRequestHandler())
+            {
+                if (_certificate != null)
+                {
+                    handler.ClientCertificates.Add(_certificate);
+                }
+
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var httpRequestMessage = new HttpRequestMessage()
+                    {
+                        RequestUri = new Uri(GetQueryString()),
+                        Method = method
+                    };
+
+                    foreach (string key in _requestHeaders.Keys)
+                    {
+                        httpRequestMessage.Headers.Add(key, _requestHeaders[key]);
+                    }
+
+                    if (_bodyParameters.Count > 0)
+                    {
+                        httpRequestMessage.Content = new FormUrlEncodedContent((_bodyParameters.ToKeyValuePairCollection()));
+                    }
+
+                    using (HttpResponseMessage response = await client.SendAsync(httpRequestMessage, cancellationToken))
+                    {
+                        if (response.IsSuccessStatusCode)
+                        {
+                            using (HttpContent content = response.Content)
+                            {
+                                result = await content.ReadAsStringAsync();
+                            }
+                        }
+                    }
+                }
+
+            }
+            return result;
+        }
+
+
+        #endregion
     }
+
+    public class Utils
+    {
+        public string Extract(string response, string path)
+        {
+            JToken jsonResponse = JToken.Parse(response);
+            return jsonResponse.SelectToken(path).ToString();
+        }
+        public T Fill<T>(string response)
+        {
+            T t = default(T);
+            Type type = typeof(T);
+            if (!string.IsNullOrEmpty(response) 
+                && type != typeof(byte) 
+                && type != typeof(sbyte) 
+                && type != typeof(int)
+                && type != typeof(uint)
+                && type != typeof(short)
+                && type != typeof(ushort)
+                && type != typeof(long)
+                && type != typeof(ulong)
+                && type != typeof(float)
+                && type != typeof(double)
+                && type != typeof(char)
+                && type != typeof(bool)
+                && type != typeof(string)
+                && type != typeof(decimal)
+                )
+            {
+                t = JsonConvert.DeserializeObject<T>(response);
+            }
+            else
+            {
+                t = (T)Convert.ChangeType(response, type);
+            }
+            return t;
+        }
+        public T WithCache<T>(T t, string key, bool withFallback = false)
+        {
+            Type type = t.GetType();
+            string region = type.BaseType.Name;
+            if (type.GetInterface("IEnumerable") != null)
+            {
+                IEnumerable<object> list = (IEnumerable<object>)t;
+                Cache.Storage.AddRange(list, key, region);
+            }
+            else
+            {
+                object value = t.GetType().GetProperty(key).GetValue(t);
+                Cache.Storage.Add(t, value.ToString(), region);
+            }
+            if (withFallback)
+            {
+                string path = $"{AppDomain.CurrentDomain.BaseDirectory}/{region}.cache";
+                Write(path, JsonConvert.SerializeObject(t));
+            }
+            return t;
+        }
+        public WebRequestHandler AddCertificate(X509Certificate certificate)
+        {
+            WebRequestHandler handler = new WebRequestHandler();
+            handler.ClientCertificates.Add(certificate);
+            return handler;
+        }
+        public HttpRequestMessage BuildRequestMessage(System.Net.Http.HttpMethod method, string url, NameValueCollection headers, NameValueCollection bodyParameters)
+        {
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage()
+            {
+                RequestUri = new Uri(url),
+                Method = method
+            };
+
+            foreach (string key in headers.Keys)
+            {
+                httpRequestMessage.Headers.Add(key, headers[key]);
+            }
+
+            if (bodyParameters.Count > 0)
+            {
+                httpRequestMessage.Content = new FormUrlEncodedContent(bodyParameters.ToKeyValuePairCollection());
+            }
+
+            return httpRequestMessage;
+        }
+        public void Write(string path, string contents)
+        {
+            File.WriteAllText(path, contents);
+        }
+        public async void WriteAsync(string path, string contents)
+        {
+            byte[] result = Encoding.ASCII.GetBytes(contents);
+            using (FileStream sourceStream = File.Open(path, FileMode.OpenOrCreate))
+            {
+                sourceStream.Seek(0, SeekOrigin.End);
+                await sourceStream.WriteAsync(result, 0, result.Length);
+            }
+        }
+        public async Task<string> ReadAsync(string path)
+        {
+            byte[] result;
+            string text = string.Empty;
+            using (FileStream sourceStream = File.Open(path, FileMode.Open))
+            {
+                result = new byte[sourceStream.Length];
+                await sourceStream.ReadAsync(result, 0, (int)sourceStream.Length);
+                text = Encoding.ASCII.GetString(result);
+            }
+            return text;
+        }
+        public string Read(string path)
+        {
+            return File.ReadAllText(path);
+        }
+    }
+
+    public static class RequestBuilderExtension
+    {
+        public static T WithCache<T>(this T t, string key)
+        {
+            Type type = t.GetType();
+            string region = type.BaseType.Name;
+            if (type.GetInterface("IEnumerable") != null)
+            {
+                IEnumerable<object> list = (IEnumerable<object>)t;
+                Cache.Storage.AddRange(list, key, region);
+            }
+            else
+            {
+                object value = t.GetType().GetProperty(key).GetValue(t);
+                Cache.Storage.Add(t, value.ToString(), region);
+            }
+            return t;
+        }
+
+        public static T AndFallback<T>(this T t)
+        {
+            Utils utils = new Utils();
+            Type type = t.GetType();
+            string region = type.BaseType.Name;
+            string path = $"{AppDomain.CurrentDomain.BaseDirectory}/{region}.cache";
+            utils.Write(path, JsonConvert.SerializeObject(t));
+            return t;
+        }
+
+        public static IEnumerable<KeyValuePair<string, string>> ToKeyValuePairCollection(this NameValueCollection nameValueCollection)
+        {
+            List<KeyValuePair<string, string>> list = new List<KeyValuePair<string, string>>();
+            foreach (string key in nameValueCollection.Keys)
+            {
+                list.Add(new KeyValuePair<string, string>(key, nameValueCollection[key]));
+            }
+            return list;
+        }
+
+        public static string GetPostData(this NameValueCollection nameValueCollection)
+        {
+            string postData = string.Empty;
+
+            foreach (string key in nameValueCollection.Keys)
+            {
+                postData += HttpUtility.UrlEncode(key) + "="
+                      + HttpUtility.UrlEncode(nameValueCollection[key]) + "&";
+            }
+            return postData;
+        }
+    }
+
+
 }

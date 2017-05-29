@@ -1,5 +1,6 @@
 ﻿using FluentHttpRequest.CacheExtension;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography.X509Certificates;
@@ -16,23 +17,17 @@ namespace FluentHttpRequest
         IFluentOperation AddBodyParam(string param, string value);
         IFluentOperation AddCertificate(string name, StoreName storeName = StoreName.Root, StoreLocation storeLocation = StoreLocation.CurrentUser);
         IFluentOperation AddCertificate(string name, string password);
-        IFluentProcess Get();
-        IFluentProcess Post();
-        Task<IFluentProcess> GetAsync();
-        Task<IFluentProcess> GetAsync(CancellationToken cancellationToken);
-        Task<IFluentProcess> PostAsync();
-        Task<IFluentProcess> PostAsync(CancellationToken cancellationToken);
+
+        
+        T Get<T>(string path = null);
+        Task<T> GetAsync<T>(string path = null);
+        Task<T> GetAsync<T>(CancellationToken cancellationToken, string path = null);
+
+        
+        T Post<T>(string path = null);
+        Task<T> PostAsync<T>(string path = null);        
+        Task<T> PostAsync<T>(CancellationToken cancellationToken, string path = null);
+        
         string GetQueryString(bool printPort = false);
-    }
-
-    public interface IFluentProcess : IFluentTransform
-    {
-        IFluentTransform Extract(string path);        
-    }
-
-    public interface IFluentTransform
-    {
-        T Fill<T>();
-        T FillWithCache<T>(string key, string region, bool withFallback = false);        
     }
 }
