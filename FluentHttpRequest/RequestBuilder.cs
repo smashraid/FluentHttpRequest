@@ -318,7 +318,7 @@ namespace FluentHttpRequest
             handler.ClientCertificates.Add(certificate);
             return handler;
         }
-        public HttpRequestMessage BuildRequestMessage(System.Net.Http.HttpMethod method, string url, NameValueCollection headers, NameValueCollection bodyParameters)
+        public HttpRequestMessage BuildRequestMessage(HttpMethod method, string url, NameValueCollection headers, NameValueCollection bodyParameters)
         {
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage()
             {
